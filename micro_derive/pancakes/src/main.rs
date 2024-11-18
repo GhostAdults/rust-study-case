@@ -5,5 +5,5 @@ use hello_mirco::HelloMicros;
 struct  Pancakes;
 
 fn main() {
-    Pancakes1::hello_macro();
+    Pancakes::hello_macro();
 }
