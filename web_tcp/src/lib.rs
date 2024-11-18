@@ -44,19 +44,9 @@ impl Worker {
     pub fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
         let thread = thread::spawn(move || loop {
             let job = receiver.lock().unwrap().recv().unwrap();
-            //TODO 
-            job.call_box();
+            println!("worker {} ,exeuting", id);
+            (job)()
         });
         Worker { id, thread }
-    }
-}
-
-trait  FnBox {
-    fn call_box(self: Box<Self>);
-}
-
-impl<F: FnOnce()> FnBox for F {
-    fn call_box(self: Box<Self>) {
-        (*self)()
     }
 }

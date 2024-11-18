@@ -1,5 +1,8 @@
-use std::{io::{Read, Write}, net::{TcpListener, TcpStream}};
 use std::fs;
+use std::{
+    io::{Read, Write},
+    net::{TcpListener, TcpStream},
+};
 use web_tcp::ThreadPool;
 
 fn main() {
@@ -13,22 +16,20 @@ fn main() {
         pool.excute(|| {
             handle_connection(stream);
         });
-       
-    
     }
 }
 
-fn handle_connection(mut stream: TcpStream){
-    let mut buffer  = [0;1024];
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 1024];
 
     stream.read(&mut buffer).unwrap();
 
     let get = b"GET / HTTP/1.1\r\n";
 
-    let (status_line ,filename) = if buffer.starts_with(get) {
-         ("HTTP/1.1 200 OK\r\n\r\n","index.html")
+    let (status_line, filename) = if buffer.starts_with(get) {
+        ("HTTP/1.1 200 OK\r\n\r\n", "index.html")
     } else {
-        ("HTTP/1.1 404 NOT FOUND\r\n\r\n","404.html")
+        ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
     };
 
     let contents = fs::read_to_string(filename).unwrap_or_else(|_| {
@@ -36,9 +37,8 @@ fn handle_connection(mut stream: TcpStream){
         String::from("File not found!")
     });
 
-    let response = format!("{}{}",status_line,contents);
+    let response = format!("{}{}", status_line, contents);
 
     stream.write(response.as_bytes()).unwrap();
     stream.flush().unwrap(); // 阻塞至流写入成功
-    
 }
