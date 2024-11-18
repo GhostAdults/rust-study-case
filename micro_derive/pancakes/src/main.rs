@@ -3,6 +3,7 @@ use hello_mirco::HelloMicros;
 
 #[derive(HelloMicros)]
 struct  Pancakes;
+
 fn main() {
-    Pancakes::hello_macro();
+    Pancakes1::hello_macro();
 }
