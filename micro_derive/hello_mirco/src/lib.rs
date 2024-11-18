@@ -1,3 +1,3 @@
-pub trait HelloMicro {
+pub trait HelloMicros {
     fn hello_macro();
 }

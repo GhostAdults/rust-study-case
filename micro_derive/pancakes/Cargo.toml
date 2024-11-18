@@ -4,3 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+hello_mirco = {path = "../hello_mirco"}
+hello_mirco_derive = {path = "../hello_mirco_derive"}

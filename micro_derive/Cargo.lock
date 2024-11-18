@@ -17,6 +17,10 @@ dependencies = [
 [[package]]
 name = "pancakes"
 version = "0.1.0"
+dependencies = [
+ "hello_mirco",
+ "hello_mirco_derive",
+]
 
 [[package]]
 name = "proc-macro2"

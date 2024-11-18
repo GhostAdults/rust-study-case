@@ -1,3 +1,8 @@
+use hello_mirco_derive::HelloMicros;
+use hello_mirco::HelloMicros;
+
+#[derive(HelloMicros)]
+struct  Pancakes;
 fn main() {
-    println!("Hello, world!");
+    Pancakes::hello_macro();
 }

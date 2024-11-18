@@ -4,6 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/hello_mirco/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/hello_mirco_derive/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/pancakes/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
