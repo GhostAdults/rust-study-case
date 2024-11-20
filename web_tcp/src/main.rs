@@ -1,4 +1,6 @@
 use std::fs;
+use std::thread;
+use std::time::Duration;
 use std::{
     io::{Read, Write},
     net::{TcpListener, TcpStream},
@@ -29,6 +31,7 @@ fn handle_connection(mut stream: TcpStream) {
     let (status_line, filename) = if buffer.starts_with(get) {
         ("HTTP/1.1 200 OK\r\n\r\n", "index.html")
     } else {
+        thread::sleep(Duration::from_secs(3));
         ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
     };
 
