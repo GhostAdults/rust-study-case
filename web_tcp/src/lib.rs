@@ -41,11 +41,11 @@ struct Worker {
     thread: thread::JoinHandle<()>,
 }
 impl Worker {
-    pub fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
         let thread = thread::spawn(move || loop {
             let job = receiver.lock().unwrap().recv().unwrap();
             println!("worker {} ,exeuting", id);
-            (job)()
+            job()
         });
         Worker { id, thread }
     }
