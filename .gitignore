@@ -1,2 +1,10 @@
 /target
 **/target
+
+# IDEA
+/.idea
+**/.idea
+
+# vscode 
+/.vscode
+**/.vscode
