@@ -1,9 +1,13 @@
+use std::pin::Pin;
+use std::thread;
 use std::{
-    future::{Future},
+    env::consts::FAMILY,
+    future::{self, Future},
     time::Duration,
 };
 
 use trpl::{Either, Html};
+use trpl::{ReceiverStream, Stream, StreamExt};
 
 async fn page_title(url: &str) -> (&str, Option<String>) {
     let repsonse_text = trpl::get(url).await.text().await;
@@ -28,64 +32,76 @@ fn main() {
     //         None => println!("{url} had no title"),
     //     }
     // })
+    // trpl::run(async {
+    //     let (tx, mut rx) = trpl::channel(); // mpsc 异步版本
+
+    //     let tx1 = tx.clone();
+    //     let tx1_fut = async move {
+    //         let vals = vec![
+    //             String::from("hi"),
+    //             String::from("from"),
+    //             String::from("the"),
+    //             String::from("future"),
+    //         ];
+
+    //         for val in vals {
+    //             tx1.send(val).unwrap();
+    //             trpl::sleep(Duration::from_millis(500)).await;
+    //         }
+    //     };
+
+    //     let tx_fut = async move {
+    //         let vals = vec![
+    //             String::from("more"),
+    //             String::from("messages"),
+    //             String::from("for"),
+    //             String::from("you"),
+    //         ];
+
+    //         for val in vals {
+    //             tx.send(val).unwrap();
+    //             trpl::sleep(Duration::from_millis(500)).await;
+    //         }
+    //     };
+    //     let rx_fut = async {
+    //         while let Some(value) = rx.recv().await {
+    //             println!("got {}", value)
+    //         }
+    //     };
+    // let futures: Vec<Pin<Box<dyn Future<Output = ()>>>> =
+    // vec![Box::pin(tx1_fut), Box::pin(rx_fut), Box::pin(tx_fut)];
+    // trpl::join_all(futures).await;
+    // trpl::race(tx_fut, tx1_fut).await;
+    // });
+    // let slow = async {
+    //     trpl::sleep(Duration::from_secs(4)).await;
+    //     "I finished!"
+    // };
+    // trpl::run(async {
+    //     match timeout(slow, Duration::from_secs(2)).await {
+    //         Ok(message) => println!("succeded with '{message}'"),
+    //         Err(duration) => println!("failed after {} seconds", duration.as_secs()),
+    //     }
+    // });
     trpl::run(async {
-        let (tx, mut rx) = trpl::channel(); // mpsc 异步版本
-
-        let tx1 = tx.clone();
-        let tx1_fut = async move {
-            let vals = vec![
-                String::from("hi"),
-                String::from("from"),
-                String::from("the"),
-                String::from("future"),
-            ];
-
-            for val in vals {
-                tx1.send(val).unwrap();
-                trpl::sleep(Duration::from_millis(500)).await;
-            }
-        };
-
-        let tx_fut = async move {
-            let vals = vec![
-                String::from("more"),
-                String::from("messages"),
-                String::from("for"),
-                String::from("you"),
-            ];
-
-            for val in vals {
-                tx.send(val).unwrap();
-                trpl::sleep(Duration::from_millis(500)).await;
-            }
-        };
-        let rx_fut = async {
-            while let Some(value) = rx.recv().await {
-                println!("got {}", value)
-            }
-        };
-        // let futures: Vec<Pin<Box<dyn Future<Output = ()>>>> =
-        // vec![Box::pin(tx1_fut), Box::pin(rx_fut), Box::pin(tx_fut)];
-        // trpl::join_all(futures).await;
-        // trpl::race(tx_fut, tx1_fut).await;
-        let slow = async {
-            trpl::sleep(Duration::from_secs(4)).await;
-            "I finished!"
-        };
-        match timeout(slow, Duration::from_secs(2)).await {
-            Ok(message) => println!("succeded with '{message}'"),
-            Err(duration) => println!("failed after {} seconds", duration.as_secs()),
+        let mut messages = get_messages();
+       
+        while let Some(message) = messages.next().await {
+            println!("{message}");
         }
+        println!("start")
     });
-    for i in 0..100 {
-        do_something();
-    }
+
 }
 
-async fn timeout<F: Future>(future_to_try: F, max_time: Duration) -> Result<F::Output, Duration> {
-    match trpl::race(future_to_try, trpl::sleep(max_time)).await {
-        Either::Left(message) => Ok(message),
-        Either::Right(_) => Err(max_time),
+fn get_messages() -> impl Stream<Item = String> {
+    let (tx, rx) = trpl::channel();
+     println!("geting");
+    let messages = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+    for message in messages {
+        tx.send(format!("Message: '{message}'")).unwrap();
     }
+    
+
+    ReceiverStream::new(rx)
 }
-fn do_something() {}
