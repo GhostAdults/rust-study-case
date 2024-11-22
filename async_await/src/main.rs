@@ -1,4 +1,7 @@
-use std::{future::{self, Future}, time::Duration};
+use std::{
+    future::{Future},
+    time::Duration,
+};
 
 use trpl::{Either, Html};
 
@@ -11,8 +14,6 @@ async fn page_title(url: &str) -> (&str, Option<String>) {
 }
 
 fn main() {
-    let mut s = String::from("hello");
-    println!("{s}");
     // let args: Vec<String> = std::env::args().collect();
     // trpl::run(async {
     //     // let url = &args[1];
@@ -63,8 +64,28 @@ fn main() {
                 println!("got {}", value)
             }
         };
-        // let futures = vec![tx1_fut,rx_fut,tx_fut];
+        // let futures: Vec<Pin<Box<dyn Future<Output = ()>>>> =
+        // vec![Box::pin(tx1_fut), Box::pin(rx_fut), Box::pin(tx_fut)];
         // trpl::join_all(futures).await;
-        trpl::join(tx_fut,tx1_fut).await
+        // trpl::race(tx_fut, tx1_fut).await;
+        let slow = async {
+            trpl::sleep(Duration::from_secs(4)).await;
+            "I finished!"
+        };
+        match timeout(slow, Duration::from_secs(2)).await {
+            Ok(message) => println!("succeded with '{message}'"),
+            Err(duration) => println!("failed after {} seconds", duration.as_secs()),
+        }
     });
+    for i in 0..100 {
+        do_something();
+    }
 }
+
+async fn timeout<F: Future>(future_to_try: F, max_time: Duration) -> Result<F::Output, Duration> {
+    match trpl::race(future_to_try, trpl::sleep(max_time)).await {
+        Either::Left(message) => Ok(message),
+        Either::Right(_) => Err(max_time),
+    }
+}
+fn do_something() {}
