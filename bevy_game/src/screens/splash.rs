@@ -1,15 +1,24 @@
 use bevy::{prelude::*, render::texture::{ImageLoaderSettings, ImageSampler}, ui::UiImageBindGroups};
 use crate::theme::prelude::*;
+use crate::AppSet;
 
 use super::Screen;
 
-const SPLASH_BACKGROUND_COLOR: Color =  Color::srgb(0.157, 0.157, 0.157);
+const SPLASH_BACKGROUND_COLOR: Color =  Color::srgb(0.1, 0.2, 0.2);
 const SPLASH_DURATION_SECS: f32 = 1.8;
 const SPLASH_FADE_DURATION_SECS: f32 = 0.6;
 
 pub(super) fn plugin(app: &mut App) {
-    app.insert_resource(ClearColor(SPLASH_BACKGROUND_COLOR));
+    // app.insert_resource(ClearColor(SPLASH_BACKGROUND_COLOR));
+    if !app.world().contains_resource::<ClearColor>() {
+        app.insert_resource(ClearColor(SPLASH_BACKGROUND_COLOR));
+    }
     app.add_systems(OnEnter(Screen::Splash), spawn_splash_screen);
+
+    app.add_systems(Update, (
+        tick_fade_in_out.in_set(AppSet::TickTimers),
+        apply_fade_in_out.in_set(AppSet::Update)
+    ).run_if(in_state(Screen::Splash)));
 }
 
 fn spawn_splash_screen(mut commands: Commands,asset_server: Res<AssetServer>) {
@@ -59,4 +68,15 @@ impl UiImageFadeInOut {
         
         ((1.0 - (2.0 * t - 1.0).abs()) / fade).min(1.0)
      }
+}
+
+fn tick_fade_in_out(time: Res<Time>, mut animation_query: Query<&mut UiImageFadeInOut>){
+    for mut anim in &mut animation_query {
+        anim.t += time.delta_seconds();
+    }
+}
+fn apply_fade_in_out(mut animation_query: Query<(&UiImageFadeInOut, &mut UiImage)>) {
+    for (anim, mut image) in &mut animation_query {
+        image.color.set_alpha(anim.alpha())
+    }
 }
