@@ -1,9 +1,9 @@
 mod action;
 mod camera;
+mod dev_tools;
 mod member;
 mod screens;
 mod theme;
-mod dev_tools;
 
 use bevy::prelude::*;
 
@@ -17,6 +17,7 @@ impl Plugin for AppPlugin {
         app.add_systems(Update, action::change_clear_color);
         app.add_plugins(member::plugin);
         app.add_plugins(screens::plugin);
+        app.add_plugins(theme::plugin);
         // dev
 
         #[cfg(feature = "dev")]
@@ -26,10 +27,10 @@ impl Plugin for AppPlugin {
 
 #[derive(SystemSet, Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
 enum AppSet {
-        /// Tick timers.
-        TickTimers,
-        /// Record player input.
-        RecordInput,
-        /// Do everything else (consider splitting this into further variants).
-        Update,
+    /// Tick timers.
+    TickTimers,
+    /// Record player input.
+    RecordInput,
+    /// Do everything else (consider splitting this into further variants).
+    Update,
 }
