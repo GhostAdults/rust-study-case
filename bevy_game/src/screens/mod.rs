@@ -1,11 +1,15 @@
 
 mod splash;
+mod loading;
+mod title;
 
 use bevy::prelude::*;
 
-pub fn plugin(app: &mut App){
+pub(super) fn plugin(app: &mut App){
     app.init_state::<Screen>();
     app.add_plugins(splash::plugin);
+    app.add_plugins(loading::plugin);
+    app.add_plugins(title::plugin);
 }
 
 

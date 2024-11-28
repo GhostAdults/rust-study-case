@@ -16,4 +16,22 @@ log = { version = "*", features = ["max_level_debug", "release_max_level_warn"] 
 
 [dependencies]
 #bevy = "0.14.2"
-bevy = { version = "0.14.2", features = ["dynamic_linking"] }
+bevy = { version = "0.14.2", features = ["wayland"] }
+
+[features]
+default = [
+    # Default to a native dev build.
+    "dev_native",
+]
+dev = [
+    # Improve compile times for dev builds by linking Bevy as a dynamic library.
+    "bevy/dynamic_linking",
+    "bevy/bevy_dev_tools",
+]
+dev_native = [
+    "dev",
+    # Enable asset hot reloading for native dev builds.
+    "bevy/file_watcher",
+    # Enable embedded asset hot reloading for native dev builds.
+    "bevy/embedded_watcher",
+]
