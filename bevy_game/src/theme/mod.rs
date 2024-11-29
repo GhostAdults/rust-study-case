@@ -17,6 +17,7 @@ pub mod prelude {
 pub struct UiFont(Handle<Font>);
 
 pub fn plugin(app: &mut App) {
+    app.add_plugins(interaction::plugin);
     app.add_systems(Startup, setup_fonts);
 }
 

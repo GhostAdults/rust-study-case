@@ -12,13 +12,13 @@ fn spawn_title_screen(mut commonds: Commands, font: Res<UiFont>) {
         .insert(StateScoped(Screen::Title))
         .with_children(|chiledren| {
             chiledren
-                .button("开始游戏", &font)
+                .button("新游戏", &font)
                 .observe(enter_gameplay_screen);
             chiledren.button("关于", &font);
-            chiledren.button("退出游戏", &font);
+            chiledren.button("退出", &font);
         });
 }
 
-fn enter_gameplay_screen(_trigger: Trigger<OnPress>) {
-    println!("starting game..");
+fn enter_gameplay_screen(_trigger: Trigger<OnPress>,mut next_screen: ResMut<NextState<Screen>>) {
+    next_screen.set(Screen::Gameplay);
 }

@@ -4,8 +4,10 @@ mod dev_tools;
 mod member;
 mod screens;
 mod theme;
+mod game;
 
 use bevy::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
 
 pub struct AppPlugin;
 
@@ -18,6 +20,12 @@ impl Plugin for AppPlugin {
         app.add_plugins(member::plugin);
         app.add_plugins(screens::plugin);
         app.add_plugins(theme::plugin);
+
+        // ldtk level
+        app.add_plugins(LdtkPlugin);
+  
+        app.add_plugins(game::plugin);
+                
         // dev
 
         #[cfg(feature = "dev")]
