@@ -8,7 +8,13 @@ pub const BUTTON_PRESSED_BACKGROUND: Color = Color::srgb(0.286, 0.478, 0.773);
 pub const BUTTON_TEXT: Color = Color::srgb(0.925, 0.925, 0.925);
 
 // 节点背景
+pub const CLEAR_BACKGROUND_COLOR: Color = Color::BLACK;
+
 pub const NODE_BACKGROUND: Color = Color::srgb(0.286, 0.478, 0.773);
+
+pub const LOADING_BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 1.0);
+
+pub const TITLE_BACKGROUND_COLOR: Color = Color::srgba(0.1, 0.1, 0.1, 1.0);
 
 // 字体
 pub const FONT_FAMILY_MISANS: &str = "fonts/MiSans-Medium-node.ttf";
