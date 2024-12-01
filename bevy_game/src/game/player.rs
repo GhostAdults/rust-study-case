@@ -5,6 +5,7 @@ use crate::game::config::PLAYER_RUN_SPEED;
 use crate::game::level::{create_texture_atlas, PlayerBundle};
 use crate::screens::Screen;
 
+use super::config::TILE_SIZE;
 use super::{level::Player, player_state::PlayerState};
 
 #[derive(Debug, Component, Default, Clone, PartialEq, Eq)]
@@ -53,12 +54,15 @@ pub fn spawn_player(
                 ..default()
             },
             facing: Facing::Right,
+            collider: Collider::ball(8. / 2.),
             velocity: Velocity::zero(),
             rigid_body: RigidBody::Dynamic,
+            restitution: Restitution::coefficient(0.3),
+            rotitatin_contrain: LockedAxes::ROTATION_LOCKED, // 锁定碰撞体为ball形
         },
         TextureAtlas {
             layout: texture_atlas_layout.clone(),
-            index: 2usize,
+            index: 1usize,
         },
     ));
 }

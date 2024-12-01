@@ -28,6 +28,7 @@ pub struct Terrain;
 #[derive(Clone, Debug, Bundle, Default, LdtkIntCell)]
 pub struct TerrainBundle {
     pub terrain: Terrain,
+    #[from_int_grid_cell]
     pub collider_bundle: ColliderBundle,
 }
 
@@ -40,13 +41,18 @@ pub struct PlayerBundle {
     pub player: Player,
     pub sprite_bundle: SpriteBundle,
     pub facing: Facing,
-    pub velocity: Velocity,    // 加速度
-    pub rigid_body: RigidBody, // 刚体
+    pub collider: Collider,             // 碰撞体 接触
+    pub velocity: Velocity,             // 加速度
+    pub rigid_body: RigidBody,          // 刚体
+    pub restitution: Restitution,       // 碰撞体
+    pub rotitatin_contrain: LockedAxes, // 锁定旋转
 }
 
 pub(super) fn plugin(app: &mut App) {
     // ldtk map
     app.insert_resource(LevelSelection::index(0));
+    // 注册瓦片
+    app.register_ldtk_int_cell::<TerrainBundle>(1);
 }
 
 pub fn setup_ldtk_world(mut conmmands: Commands, asset_server: Res<AssetServer>) {
@@ -77,8 +83,8 @@ pub fn spawn_ldtk_entity(
     for (_entity, transform, entity_instance) in entity_query.iter() {
         // let texture_atlas_handle: Handle<TextureAtlasLayout> = texture_atlases.add(texture_atlas);
         // let atlas_linear_handle = texture_atlases.add(texture_atlas_linear);
-        let mut translation = transform.translation + LEVEL_TRANSLATION_OFFSET;
-        translation.z = 10.0;
+        // let mut translation = transform.translation + LEVEL_TRANSLATION_OFFSET;
+        // translation.z = 10.0;
 
         if entity_instance.identifier == "Player" && q_player.is_empty() {
             spawn_player(
@@ -122,6 +128,7 @@ pub fn create_texture_atlas(
 impl From<IntGridCell> for ColliderBundle {
     fn from(int_grid_cell: IntGridCell) -> Self {
         if int_grid_cell.value == 1 {
+            println!("creat grid collider");
             Self {
                 collider: Collider::cuboid(TILE_SIZE / 2.0, TILE_SIZE / 2.0),
                 rigid_body: RigidBody::Fixed,
