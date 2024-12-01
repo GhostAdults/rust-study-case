@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 mod camera;
+mod config;
 pub mod level;
 mod player;
 mod player_state;

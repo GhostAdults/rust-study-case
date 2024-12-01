@@ -2,11 +2,34 @@ use std::default;
 
 use bevy::{asset::LoadedFolder, prelude::*, render::texture::ImageSampler};
 use bevy_ecs_ldtk::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 use crate::screens::prelude::SpriteFolder;
 
-use super::player::spawn_player;
+use super::{
+    config::TILE_SIZE,
+    player::{spawn_player, Facing},
+};
 pub const LEVEL_TRANSLATION_OFFSET: Vec3 = Vec3::new(-250.0, -220.0, 0.0);
+
+//碰撞
+#[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
+pub struct ColliderBundle {
+    pub collider: Collider,
+    pub rigid_body: RigidBody,
+    pub restitution: Restitution,
+    pub active_events: ActiveEvents,
+}
+
+// 地形
+#[derive(Debug, Default, Component, Clone, Copy)]
+pub struct Terrain;
+
+#[derive(Clone, Debug, Bundle, Default, LdtkIntCell)]
+pub struct TerrainBundle {
+    pub terrain: Terrain,
+    pub collider_bundle: ColliderBundle,
+}
 
 // player
 #[derive(Component, Default, Debug, Clone)]
@@ -16,6 +39,9 @@ pub struct Player;
 pub struct PlayerBundle {
     pub player: Player,
     pub sprite_bundle: SpriteBundle,
+    pub facing: Facing,
+    pub velocity: Velocity,    // 加速度
+    pub rigid_body: RigidBody, // 刚体
 }
 
 pub(super) fn plugin(app: &mut App) {
@@ -91,4 +117,19 @@ pub fn create_texture_atlas(
     image.sampler = sampling.unwrap_or_default();
 
     (texture_atlas_layout, texture)
+}
+
+impl From<IntGridCell> for ColliderBundle {
+    fn from(int_grid_cell: IntGridCell) -> Self {
+        if int_grid_cell.value == 1 {
+            Self {
+                collider: Collider::cuboid(TILE_SIZE / 2.0, TILE_SIZE / 2.0),
+                rigid_body: RigidBody::Fixed,
+                restitution: Restitution::new(0.0),
+                active_events: ActiveEvents::COLLISION_EVENTS,
+            }
+        } else {
+            panic!("unsupported int grid cell value")
+        }
+    }
 }

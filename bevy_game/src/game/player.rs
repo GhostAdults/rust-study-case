@@ -1,11 +1,24 @@
 use bevy::{asset::LoadedFolder, prelude::*, render::texture::ImageSampler};
+use bevy_rapier2d::prelude::*;
 
+use crate::game::config::PLAYER_RUN_SPEED;
 use crate::game::level::{create_texture_atlas, PlayerBundle};
+use crate::screens::Screen;
 
-use super::level::Player;
+use super::{level::Player, player_state::PlayerState};
+
+#[derive(Debug, Component, Default, Clone, PartialEq, Eq)]
+pub enum Facing {
+    Left,
+    #[default]
+    Right,
+}
 
 pub(super) fn plugin(app: &mut App) {
-    //
+    app.add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0));
+    app.add_plugins(RapierDebugRenderPlugin::default());
+    // 加入角色移动系统
+    app.add_systems(Update, (player_run).run_if(in_state(Screen::Gameplay)));
 }
 
 pub fn spawn_player(
@@ -16,7 +29,7 @@ pub fn spawn_player(
     asset_server: &Res<AssetServer>,
     player_pos: Vec3,
 ) {
-    let (texture_atlas_nearest, linear_texture) = create_texture_atlas(
+    let (_texture_atlas_nearest, linear_texture) = create_texture_atlas(
         loaded_folder,
         None,
         Some(ImageSampler::nearest()), // 纹理为最近邻采样模式
@@ -34,15 +47,40 @@ pub fn spawn_player(
                 texture: linear_texture.clone(),
                 transform: Transform {
                     translation: player_pos,
-                    scale: Vec3::splat(2.),
+                    scale: Vec3::splat(1.),
                     ..default()
                 },
                 ..default()
             },
+            facing: Facing::Right,
+            velocity: Velocity::zero(),
+            rigid_body: RigidBody::Dynamic,
         },
         TextureAtlas {
             layout: texture_atlas_layout.clone(),
             index: 2usize,
         },
     ));
+}
+
+// PLAYER RUN
+pub fn player_run(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut q_palyer: Query<&mut Velocity, With<Player>>,
+    player_state: Res<PlayerState>,
+) {
+    if q_palyer.is_empty() {
+        return;
+    }
+    if *player_state == PlayerState::Runing || *player_state == PlayerState::Standing {
+        let mut velocity = q_palyer.single_mut();
+        if keyboard_input.pressed(KeyCode::KeyA) {
+            velocity.linvel.x = -PLAYER_RUN_SPEED;
+            println!("{}", velocity.linvel.x);
+        } else if keyboard_input.pressed(KeyCode::KeyD) {
+            velocity.linvel.x = PLAYER_RUN_SPEED;
+        } else {
+            velocity.linvel.x = 0.0;
+        }
+    }
 }
