@@ -15,9 +15,9 @@ pub(super) fn plugin(app: &mut App) {
     app.insert_resource(DelayedTimer(Timer::from_seconds(2.0, TimerMode::Repeating)));
     app.add_systems(
         OnEnter(Screen::Loading),
-        (spawn_loading_screen, load_textures).chain(),
+        (spawn_loading_screen,),
     );
-    app.add_systems(Update, check_textures.run_if(in_state(Screen::Loading)));
+    app.add_systems(Update, (load_textures,check_textures).chain().run_if(in_state(Screen::Loading)));
     app.add_systems(
         Update,
         continue_to_game_screen.run_if(in_state(Screen::Loading)),

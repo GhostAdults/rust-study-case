@@ -1,3 +1,4 @@
+use bevy::transform::commands;
 use bevy::{asset::LoadedFolder, prelude::*, render::texture::ImageSampler};
 use bevy_rapier2d::prelude::*;
 
@@ -5,8 +6,13 @@ use crate::game::config::PLAYER_RUN_SPEED;
 use crate::game::level::{create_texture_atlas, PlayerBundle};
 use crate::screens::Screen;
 
-use super::config::TILE_SIZE;
+use super::config::{PLAYER_JUMP_SPEED, TILE_SIZE,PLAYER_GRAVITY_SCALE};
 use super::{level::Player, player_state::PlayerState};
+
+// 角色是否在地面上
+#[derive(Debug, Default, Resource, Reflect)]
+#[reflect(Resource)]
+pub struct PlayerGrounded(pub bool);
 
 #[derive(Debug, Component, Default, Clone, PartialEq, Eq)]
 pub enum Facing {
@@ -19,7 +25,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0));
     app.add_plugins(RapierDebugRenderPlugin::default());
     // 加入角色移动系统
-    app.add_systems(Update, (player_run).run_if(in_state(Screen::Gameplay)));
+    app.add_systems(Update, (player_run,player_jump).run_if(in_state(Screen::Gameplay)));
 }
 
 pub fn spawn_player(
@@ -54,15 +60,16 @@ pub fn spawn_player(
                 ..default()
             },
             facing: Facing::Right,
-            collider: Collider::ball(8. / 2.),
+            collider: Collider::ball(TILE_SIZE / 2.),
             velocity: Velocity::zero(),
             rigid_body: RigidBody::Dynamic,
-            restitution: Restitution::coefficient(0.3),
+            restitution: Restitution::coefficient(0.),
             rotitatin_contrain: LockedAxes::ROTATION_LOCKED, // 锁定碰撞体为ball形
+            gravity_scale: GravityScale(PLAYER_GRAVITY_SCALE),
         },
         TextureAtlas {
             layout: texture_atlas_layout.clone(),
-            index: 1usize,
+            index: 16 * 10 + 1usize,
         },
     ));
 }
@@ -80,11 +87,32 @@ pub fn player_run(
         let mut velocity = q_palyer.single_mut();
         if keyboard_input.pressed(KeyCode::KeyA) {
             velocity.linvel.x = -PLAYER_RUN_SPEED;
-            println!("{}", velocity.linvel.x);
         } else if keyboard_input.pressed(KeyCode::KeyD) {
             velocity.linvel.x = PLAYER_RUN_SPEED;
         } else {
             velocity.linvel.x = 0.0;
         }
     }
+}
+
+// PLAYER Jump
+pub fn player_jump(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut q_player: Query<(&mut Velocity,&Transform), With<Player>>,
+    player_state: Res<PlayerState>,
+) {
+    if q_player.is_empty() {
+        return;
+    }
+    if *player_state == PlayerState::Standing
+    || *player_state == PlayerState::Runing {
+     
+    let (mut velocity, transform) = q_player.single_mut();
+    if keyboard_input.just_pressed(KeyCode::KeyK) {
+        velocity.linvel.y += PLAYER_JUMP_SPEED;
+    }
+       
+}
 }

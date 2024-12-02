@@ -46,12 +46,13 @@ pub struct PlayerBundle {
     pub rigid_body: RigidBody,          // 刚体
     pub restitution: Restitution,       // 碰撞体
     pub rotitatin_contrain: LockedAxes, // 锁定旋转
+    pub gravity_scale: GravityScale,    // 重力
 }
 
 pub(super) fn plugin(app: &mut App) {
     // ldtk map
     app.insert_resource(LevelSelection::index(0));
-    // 注册瓦片
+    // 注册瓦片 
     app.register_ldtk_int_cell::<TerrainBundle>(1);
 }
 
