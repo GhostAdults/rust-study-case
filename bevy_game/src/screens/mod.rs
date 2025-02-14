@@ -25,5 +25,5 @@ pub enum Screen {
     Loading,
     Title,
     Credits,
-    Gameplay,
+    Gameplay, // 游戏进行中
 }

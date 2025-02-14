@@ -34,6 +34,7 @@ where
             Some(v) => v,
             None => {
                 let v = (self.calculation)(arg);
+                println!("this way");
                 self.value = Some(v);
                 v
             }
