@@ -1,5 +1,6 @@
 /target
 **/target
+*/target
 
 # IDEA
 /.idea
@@ -8,3 +9,7 @@
 # vscode 
 /.vscode
 **/.vscode
+
+# node
+/node_modules
+**/node_modules

@@ -18,6 +18,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 #[derive(States, Debug, Hash, PartialEq, Eq, Clone, Default)]
+// app状态
 pub enum Screen {
     #[default]
     Splash,

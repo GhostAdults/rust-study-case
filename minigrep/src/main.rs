@@ -5,6 +5,7 @@ use std::process;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+    
 
     let config = Config::new();
     match config.push_variable(args) {

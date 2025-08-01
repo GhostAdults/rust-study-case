@@ -1,4 +1,4 @@
-use std::default;
+
 
 use bevy::{asset::LoadedFolder, prelude::*, render::texture::ImageSampler};
 use bevy_ecs_ldtk::prelude::*;
@@ -8,7 +8,7 @@ use crate::screens::prelude::SpriteFolder;
 
 use super::{
     config::TILE_SIZE,
-    player::{spawn_player, Facing},
+    player::{spawn_player, Facing, JumpController},
 };
 pub const LEVEL_TRANSLATION_OFFSET: Vec3 = Vec3::new(-250.0, -220.0, 0.0);
 
@@ -47,6 +47,7 @@ pub struct PlayerBundle {
     pub restitution: Restitution,       // 碰撞体
     pub rotitatin_contrain: LockedAxes, // 锁定旋转
     pub gravity_scale: GravityScale,    // 重力
+    pub jump_controller: JumpController, // 跳跃控制器
 }
 
 pub(super) fn plugin(app: &mut App) {
@@ -94,7 +95,7 @@ pub fn spawn_ldtk_entity(
                 &loaded_folder,
                 &mut textures,
                 &asset_server,
-                (transform.translation + LEVEL_TRANSLATION_OFFSET),
+                transform.translation + LEVEL_TRANSLATION_OFFSET,
             );
         }
     }
